@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPL Training Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f8f8;
+    --border: #e8e8e8;
+    --text: #111111;
+    --text-muted: #666666;
+    --text-dim: #aaaaaa;
+    --accent: #2563eb;
+    --accent-dim: rgba(37,99,235,0.07);
+    --push-color: #ea580c;
+    --push-bg: rgba(234,88,12,0.08);
+    --pull-color: #0369a1;
+    --pull-bg: rgba(3,105,161,0.08);
+    --legs-color: #7c3aed;
+    --legs-bg: rgba(124,58,237,0.08);
+    --rest-color: #059669;
+    --rest-bg: rgba(5,150,105,0.08);
+    --red: #dc2626;
+    --red-bg: rgba(220,38,38,0.06);
+    --red-border: rgba(220,38,38,0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+  /* HERO */
+  .hero { padding: 72px 24px 56px; max-width: 920px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+  .hero-eyebrow { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  .hero-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(34px, 6vw, 60px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 18px; }
+  .hero-title span { color: var(--accent); }
+  .hero-desc { font-size: 15px; color: var(--text-muted); max-width: 500px; line-height: 1.75; }
+  .hero-stats { display: flex; gap: 40px; margin-top: 36px; flex-wrap: wrap; padding-top: 32px; border-top: 1px solid var(--border); }
+  .stat { display: flex; flex-direction: column; gap: 3px; }
+  .stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .stat-label { font-size: 12px; color: var(--text-dim); }
+
+  /* NAV */
+  .nav-sticky { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 0 24px; }
+  .nav-inner { max-width: 920px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn { flex-shrink: 0; padding: 14px 16px; border: none; background: none; color: var(--text-dim); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .nav-btn:hover { color: var(--text-muted); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* MAIN */
+  .main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+  .day-panel { display: none; padding-top: 40px; }
+  .day-panel.visible { display: block; }
+
+  .day-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .day-tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  .tag-push { background: var(--push-bg); color: var(--push-color); }
+  .tag-pull { background: var(--pull-bg); color: var(--pull-color); }
+  .tag-legs { background: var(--legs-bg); color: var(--legs-color); }
+  .day-title-text { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+  .day-focus { font-size: 13px; color: var(--text-muted); margin-top: 5px; }
+  .exercise-count { font-size: 12px; color: var(--text-dim); padding-top: 6px; white-space: nowrap; }
+
+  /* SECTION DIVIDER */
+  .section-divider { display: flex; align-items: center; gap: 10px; margin: 28px 0 0; }
+  .section-divider span { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); white-space: nowrap; }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* EXERCISE CARD */
+  .ex-card { border: 1px solid var(--border); border-radius: 10px; margin-top: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+  .ex-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .ex-main { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; background: var(--bg); transition: background 0.1s; user-select: none; }
+  .ex-main:hover { background: var(--surface); }
+
+  .ex-num { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-dim); text-align: center; }
+  .ex-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; }
+  .ex-tip { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .ex-right { display: flex; align-items: center; gap: 10px; }
+  .ex-sets { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent); background: var(--accent-dim); padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+
+  .form-toggle { font-size: 11px; font-weight: 600; color: var(--text-dim); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 3px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  .form-toggle .play-icon { width: 12px; height: 12px; }
+  .ex-card.open .form-toggle { background: #fff0f0; border-color: #fca5a5; color: var(--red); }
+
+  /* FORM PANEL */
+  .form-panel { display: none; border-top: 1px solid var(--border); background: #fafafa; }
+  .ex-card.open .form-panel { display: block; }
+
+  .form-inner { padding: 16px 16px 16px 60px; }
+
+  /* VIDEO EMBED */
+  .video-wrap { position: relative; width: 100%; max-width: 560px; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .video-wrap::before { content: ''; display: block; padding-top: 56.25%; }
+  .video-thumb { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .video-thumb .play-btn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: background 0.2s; }
+  .video-thumb:hover .play-btn { background: rgba(0,0,0,0.5); }
+  .play-circle { width: 56px; height: 56px; background: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .play-circle svg { margin-left: 4px; }
+  .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+
+  .video-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+
+  /* FORM CUES */
+  .cue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  @media (max-width: 600px) { .cue-grid { grid-template-columns: 1fr; } }
+
+  .cue-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .cue-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .cue-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .cue-list li { font-size: 12.5px; color: var(--text-muted); padding-left: 14px; position: relative; line-height: 1.5; }
+  .cue-list li::before { content: '·'; position: absolute; left: 2px; color: var(--accent); font-size: 16px; line-height: 1.1; }
+
+  .mistake-box { background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 8px; padding: 10px 14px; margin-top: 10px; }
+  .mistake-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
+  .mistake-text { font-size: 12.5px; color: #7f1d1d; line-height: 1.5; }
+
+  /* CALLOUT */
+  .callout { border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 11px 16px; margin-top: 24px; font-size: 13px; color: var(--text-muted); line-height: 1.6; background: var(--accent-dim); }
+  .callout strong { color: var(--text); }
+
+  /* REST */
+  .rest-panel { margin-top: 48px; padding: 48px 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; text-align: center; }
+  .rest-big { font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700; color: var(--rest-color); margin-bottom: 12px; letter-spacing: -0.03em; }
+  .rest-sub { font-size: 15px; color: var(--text-muted); max-width: 380px; margin: 0 auto; line-height: 1.7; }
+  .rest-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  .rest-pill { padding: 6px 14px; background: var(--rest-bg); border: 1px solid rgba(5,150,105,0.2); border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--rest-color); }
+
+  .footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; color: var(--text-dim); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 48px 20px 40px; }
+    .hero-stats { gap: 20px; }
+    .main { padding: 0 16px 60px; }
+    .form-inner { padding: 12px 12px 12px 12px; }
+    .rest-panel { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <p class="hero-eyebrow">6-day PPL split · muscle & weight gain</p>
+  <h1 class="hero-title">Train.<br><span>Eat.</span><br>Grow.</h1>
+  <p class="hero-desc">Push–pull–legs built for progressive overload. Tap any exercise to watch the form video and see key cues instantly.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-val">6</span><span class="stat-label">days / week</span></div>
+    <div class="stat"><span class="stat-val">A+B</span><span class="stat-label">variation each split</span></div>
+    <div class="stat"><span class="stat-val">~60</span><span class="stat-label">min per session</span></div>
+    <div class="stat"><span class="stat-val">Surplus</span><span class="stat-label">calorie intake required</span></div>
+  </div>
+</section>
+
+<nav class="nav-sticky">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="show(0)">Mon · Push A</button>
+    <button class="nav-btn" onclick="show(1)">Tue · Pull A</button>
+    <button class="nav-btn" onclick="show(2)">Wed · Legs A</button>
+    <button class="nav-btn" onclick="show(3)">Thu · Push B</button>
+    <button class="nav-btn" onclick="show(4)">Fri · Pull B</button>
+    <button class="nav-btn" onclick="show(5)">Sat · Legs B</button>
+    <button class="nav-btn" onclick="show(6)">Sun · Rest</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ══════════════════════════════
+     MON — PUSH A
+══════════════════════════════ -->
+<div class="day-panel visible" id="day-0">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-push">Push A</div>
+      <div class="day-title-text">Monday</div>
+      <div class="day-focus">Chest focus — compounds before fatigue</div>
+    </div>
+    <div class="exercise-count">7 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Chest</span></div>
+
+  <!-- Flat Chest Press -->
+  <div class="ex-card" id="e1">
+    <div class="ex-main" onclick="toggle('e1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body">
+        <div class="ex-name">Flat barbell / machine chest press</div>
+        <div class="ex-tip">Lead compound — go heavy, rest 2–3 min</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">4 × 6–10</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e1">
+        <div class="video-thumb" onclick="loadVideo('v-e1','dGeLLSilxMM')">
+          <img src="https://img.youtube.com/vi/dGeLLSilxMM/hqdefault.jpg" alt="Barbell Bench Press form">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Setup</div><ul class="cue-list"><li>Eyes under the bar, feet flat</li><li>Shoulder blades retracted & depressed</li><li>Slight arch in lower back</li></ul></div>
+        <div class="cue-box"><div class="cue-label">Execution</div><ul class="cue-list"><li>Bar to mid-chest, elbows at ~75°</li><li>Press in slight arc back to rack</li><li>Full lockout without losing shoulder position</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Elbows flaring to 90° — stresses the shoulder joint. Keep them slightly tucked.</div></div>
+    </div></div>
+  </div>
+
+  <!-- Incline DB Press -->
+  <div class="ex-card" id="e2">
+    <div class="ex-main" onclick="toggle('e2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body">
+        <div class="ex-name">Incline dumbbell press</div>
+        <div class="ex-tip">Upper chest while still fresh</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">3 × 8–12</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e2">
+        <div class="video-thumb" onclick="loadVideo('v-e2','8iPEnn-ltC8')">
+          <img src="https://img.youtube.com/vi/8iPEnn-ltC8/hqdefault.jpg" alt="Incline DB Press form">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Setup</div><ul class="cue-list"><li>Bench at 30–45° only</li><li>Shoulder blades pulled back into pad</li></ul></div>
+        <div class="cue-box"><div class="cue-label">Execution</div><ul class="cue-list"><li>Lower to upper chest, elbows at 75°</li><li>Press up and slightly inward</li><li>Don't let shoulders roll forward at top</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Bench too high (>45°) — you end up doing a shoulder press, not upper chest.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Shoulders</span></div>
+
+  <!-- DB Shoulder Press -->
+  <div class="ex-card" id="e3">
+    <div class="ex-main" onclick="toggle('e3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body">
+        <div class="ex-name">Dumbbell shoulder press</div>
+        <div class="ex-tip">Seated or standing</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">3 × 10–12</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e3">
+        <div class="video-thumb" onclick="loadVideo('v-e3','qEwKCR5JCog')">
+          <img src="https://img.youtube.com/vi/qEwKCR5JCog/hqdefault.jpg" alt="DB Shoulder Press form">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Setup</div><ul class="cue-list"><li>Back straight, core braced</li><li>Dumbbells at ear level, forearms vertical</li></ul></div>
+        <div class="cue-box"><div class="cue-label">Execution</div><ul class="cue-list"><li>Press directly overhead to full lockout</li><li>Don't shrug at the top</li><li>Lower controlled back to ear level</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Arching the lower back to compensate. Brace your core and keep ribs down every rep.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Triceps</span></div>
+
+  <!-- Cable Overhead Tri Extension -->
+  <div class="ex-card" id="e4">
+    <div class="ex-main" onclick="toggle('e4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body">
+        <div class="ex-name">Cable overhead tricep extension</div>
+        <div class="ex-tip">Long head stretch — elbows stay forward</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">3 × 10–12</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e4">
+        <div class="video-thumb" onclick="loadVideo('v-e4','_gsUck-7M74')">
+          <img src="https://img.youtube.com/vi/_gsUck-7M74/hqdefault.jpg" alt="Cable Overhead Tricep Extension">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Setup</div><ul class="cue-list"><li>Rope at top, face away, step forward</li><li>Elbows pointed forward — not flared</li><li>Slight forward hinge at hips</li></ul></div>
+        <div class="cue-box"><div class="cue-label">Execution</div><ul class="cue-list"><li>Extend forearms forward until arms straight</li><li>Spread rope at the end, squeeze hard</li><li>Only forearms move — upper arms stay still</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Elbows drifting out and down during the movement. Keep them pointing straight ahead throughout.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Isolation finishers</span></div>
+
+  <!-- Cable Lateral Raise -->
+  <div class="ex-card" id="e5">
+    <div class="ex-main" onclick="toggle('e5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body">
+        <div class="ex-name">Cable lateral raise</div>
+        <div class="ex-tip">Cable keeps tension at top unlike dumbbells</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">3 × 12–15</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e5">
+        <div class="video-thumb" onclick="loadVideo('v-e5','Mb2culNbBMo')">
+          <img src="https://img.youtube.com/vi/Mb2culNbBMo/hqdefault.jpg" alt="Cable Lateral Raise">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Cable low, hold across body, slight forward lean</li><li>Lead with elbow, not hand</li><li>Pinky slightly higher than thumb at top</li><li>Slow controlled descent</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Swinging the body to get the arm up. Drop the weight and isolate the side delt properly.</div></div>
+    </div></div>
+  </div>
+
+  <!-- Pec Deck Fly -->
+  <div class="ex-card" id="e6">
+    <div class="ex-main" onclick="toggle('e6')">
+      <div class="ex-num">6</div>
+      <div class="ex-body">
+        <div class="ex-name">Pec deck fly</div>
+        <div class="ex-tip">Squeeze at peak contraction — 1 sec hold</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">3 × 12–15</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e6">
+        <div class="video-thumb" onclick="loadVideo('v-e6','Z57CtFmRMxA')">
+          <img src="https://img.youtube.com/vi/Z57CtFmRMxA/hqdefault.jpg" alt="Pec Deck Fly">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Seat at chest height, back flat against pad</li><li>Hug a barrel — squeeze at peak, 1 sec hold</li><li>Elbows slightly bent throughout</li><li>Don't go past a mild stretch at the back</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Going too far back — loads the shoulder joint instead of stretching the chest.</div></div>
+    </div></div>
+  </div>
+
+  <!-- Cable Pushdown Rope -->
+  <div class="ex-card" id="e7">
+    <div class="ex-main" onclick="toggle('e7')">
+      <div class="ex-num">7</div>
+      <div class="ex-body">
+        <div class="ex-name">Cable pushdown (rope)</div>
+        <div class="ex-tip">Spread rope at bottom, elbows pinned to ribs</div>
+      </div>
+      <div class="ex-right">
+        <span class="ex-sets">2 × 12–15</span>
+        <span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span>
+      </div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-e7">
+        <div class="video-thumb" onclick="loadVideo('v-e7','vB5OHsJ3EME')">
+          <img src="https://img.youtube.com/vi/vB5OHsJ3EME/hqdefault.jpg" alt="Cable Rope Pushdown">
+          <div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div>
+        </div>
+      </div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Upper arms locked to sides — don't move</li><li>Spread rope apart at full extension</li><li>Return slowly to ~90° only</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Upper arms drifting forward. Lock elbows to ribs and keep them there the entire set.</div></div>
+    </div></div>
+  </div>
+
+  <div class="callout"><strong>Progressive overload:</strong> Add weight when you hit the top of the rep range for 2 sessions in a row.</div>
+</div>
+
+<!-- ══════════════════════════════
+     TUE — PULL A
+══════════════════════════════ -->
+<div class="day-panel" id="day-1">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-pull">Pull A</div>
+      <div class="day-title-text">Tuesday</div>
+      <div class="day-focus">Back width — vertical pulling, lat development</div>
+    </div>
+    <div class="exercise-count">6 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Back — width</span></div>
+
+  <div class="ex-card" id="p1">
+    <div class="ex-main" onclick="toggle('p1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body"><div class="ex-name">Lat pulldown (wide, overhand)</div><div class="ex-tip">Lead compound — drive elbows to pockets</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 8–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p1"><div class="video-thumb" onclick="loadVideo('v-p1','CAwf7n6Luuc')"><img src="https://img.youtube.com/vi/CAwf7n6Luuc/hqdefault.jpg" alt="Lat Pulldown"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Depress shoulders first before pulling</li><li>Drive elbows down and back toward hips</li><li>Full stretch at the top every rep</li><li>Lean back 10–15°, not straight up</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Pulling with biceps not lats. Think "elbows to pockets" — biceps are just hooks.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="p2">
+    <div class="ex-main" onclick="toggle('p2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body"><div class="ex-name">Seated cable row (wide grip)</div><div class="ex-tip">Chest tall, squeeze shoulder blades</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p2"><div class="video-thumb" onclick="loadVideo('v-p2','GZbfZ033f74')"><img src="https://img.youtube.com/vi/GZbfZ033f74/hqdefault.jpg" alt="Seated Cable Row"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Torso upright and still — no rocking</li><li>Retract shoulder blades first, then pull</li><li>Handle to lower sternum, 1 sec squeeze</li><li>Full arm extension at the start</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Rocking the torso to create momentum. Keep it still — all movement is arms and shoulder blades only.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="p3">
+    <div class="ex-main" onclick="toggle('p3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body"><div class="ex-name">Straight-arm cable pulldown</div><div class="ex-tip">Isolates lats — no bicep involvement</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p3"><div class="video-thumb" onclick="loadVideo('v-p3','il-4RxDC5KQ')"><img src="https://img.youtube.com/vi/il-4RxDC5KQ/hqdefault.jpg" alt="Straight Arm Pulldown"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Cable high, stand back ~1m, hip hinge forward</li><li>Arms nearly straight — lock that angle</li><li>Pull bar to thighs using only lats</li><li>Squeeze at bottom, slow return to stretch</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Bending the elbows mid-rep. The moment you do, biceps take over. Keep arms straight.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Rear delts</span></div>
+
+  <div class="ex-card" id="p4">
+    <div class="ex-main" onclick="toggle('p4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body"><div class="ex-name">Pec deck reverse fly</div><div class="ex-tip">Elbows slightly bent throughout</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p4"><div class="video-thumb" onclick="loadVideo('v-p4','Rm1j0NbFSZ0')"><img src="https://img.youtube.com/vi/Rm1j0NbFSZ0/hqdefault.jpg" alt="Pec Deck Reverse Fly"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Face machine, chest against pad</li><li>Drive elbows back — pull them behind you</li><li>Squeeze rear delts at peak, 1 sec hold</li><li>Return slowly, don't slam the weights</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Straightening arms fully — turns it into a tricep move. Keep slight elbow bend locked in.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Biceps</span></div>
+
+  <div class="ex-card" id="p5">
+    <div class="ex-main" onclick="toggle('p5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body"><div class="ex-name">EZ bar curl</div><div class="ex-tip">Primary mass builder — slow eccentric</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 8–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p5"><div class="video-thumb" onclick="loadVideo('v-p5','zG2C5nqeUb8')"><img src="https://img.youtube.com/vi/zG2C5nqeUb8/hqdefault.jpg" alt="EZ Bar Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Elbows pinned to sides — don't move</li><li>Curl up, supinate wrists at top</li><li>3 sec controlled descent every rep</li><li>Full extension at the bottom</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Swinging the torso back. That's your lower back working, not your biceps. Go lighter.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="p6">
+    <div class="ex-main" onclick="toggle('p6')">
+      <div class="ex-num">6</div>
+      <div class="ex-body"><div class="ex-name">Hammer curl</div><div class="ex-tip">Neutral grip throughout — no wrist rotation</div></div>
+      <div class="ex-right"><span class="ex-sets">2 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-p6"><div class="video-thumb" onclick="loadVideo('v-p6','TwD-YGVP4Bk')"><img src="https://img.youtube.com/vi/TwD-YGVP4Bk/hqdefault.jpg" alt="Hammer Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Neutral grip (palms face each other)</li><li>Elbows pinned to sides throughout</li><li>Thumbs point up at the top</li><li>Full extension at the bottom</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Rotating the wrist into a supinated curl mid-rep. Keep neutral grip the whole way through.</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     WED — LEGS A
+══════════════════════════════ -->
+<div class="day-panel" id="day-2">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-legs">Legs A</div>
+      <div class="day-title-text">Wednesday</div>
+      <div class="day-focus">Quad focus — squat pattern leads</div>
+    </div>
+    <div class="exercise-count">5 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Quads — compound</span></div>
+
+  <div class="ex-card" id="la1">
+    <div class="ex-main" onclick="toggle('la1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body"><div class="ex-name">Goblet squat → progress to hack squat</div><div class="ex-tip">Go heavier each week, full depth</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 8–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-la1"><div class="video-thumb" onclick="loadVideo('v-la1','MxsFDJCGFYU')"><img src="https://img.youtube.com/vi/MxsFDJCGFYU/hqdefault.jpg" alt="Goblet Squat"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Hold dumbbell at chest, elbows tucked under</li><li>Knees push out in toe direction as you descend</li><li>Sit between your heels, chest upright</li><li>Squeeze glutes hard at the top</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Knees caving inward on the way up. Actively push knees out — "spread the floor with your feet".</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="la2">
+    <div class="ex-main" onclick="toggle('la2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body"><div class="ex-name">Bulgarian split squat</div><div class="ex-tip">Rear foot elevated, front knee tracks toe</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10 each</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-la2"><div class="video-thumb" onclick="loadVideo('v-la2','2C-uNgKwPLE')"><img src="https://img.youtube.com/vi/2C-uNgKwPLE/hqdefault.jpg" alt="Bulgarian Split Squat"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Rear foot on bench (top of foot flat)</li><li>Drop hips straight down, not forward</li><li>Front knee tracks over 2nd/3rd toe</li><li>Drive through front heel to stand</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Front foot too close — knee shoots past toes. Step further forward so your shin stays roughly vertical.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Posterior chain</span></div>
+
+  <div class="ex-card" id="la3">
+    <div class="ex-main" onclick="toggle('la3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body"><div class="ex-name">Romanian deadlift (RDL)</div><div class="ex-tip">Hip hinge — feel the hamstring stretch at bottom</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 8–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-la3"><div class="video-thumb" onclick="loadVideo('v-la3','jEy_czb3RKA')"><img src="https://img.youtube.com/vi/jEy_czb3RKA/hqdefault.jpg" alt="Romanian Deadlift"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Soft knee bend, constant throughout</li><li>Push hips back — bar slides down the legs</li><li>Stop where back is flat (not where you feel like going)</li><li>Drive hips forward, squeeze glutes at top</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Rounding the lower back chasing depth. Stop where you can maintain a flat back — the stretch is in the hamstrings, not the spine.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="la4">
+    <div class="ex-main" onclick="toggle('la4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body"><div class="ex-name">Leg curl (lying or seated)</div><div class="ex-tip">3 sec eccentric — hamstrings grow here</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-la4"><div class="video-thumb" onclick="loadVideo('v-la4','ELOCsoDSmrg')"><img src="https://img.youtube.com/vi/ELOCsoDSmrg/hqdefault.jpg" alt="Leg Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Hips flat on pad — don't let them rise</li><li>Curl to full contraction, squeeze 1 sec</li><li>3 sec controlled descent every rep</li><li>Full extension at the bottom</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Hips rising off the pad — glutes taking over. Drop the weight and keep hips pressed down.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Calves</span></div>
+
+  <div class="ex-card" id="la5">
+    <div class="ex-main" onclick="toggle('la5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body"><div class="ex-name">Standing calf raise</div><div class="ex-tip">Full ROM — pause at bottom stretch</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-la5"><div class="video-thumb" onclick="loadVideo('v-la5','gwLzBJYoWlQ')"><img src="https://img.youtube.com/vi/gwLzBJYoWlQ/hqdefault.jpg" alt="Standing Calf Raise"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Balls of feet on edge, heels hanging</li><li>Lower heels fully — 2 sec pause at stretch</li><li>Rise as high as possible on toes</li><li>Don't bounce out of the bottom</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Partial range — just bobbing. Calves need full stretch under load. Go all the way down every rep.</div></div>
+    </div></div>
+  </div>
+
+  <div class="callout"><strong>Rest 2–3 min</strong> after squats and RDL. These are your money sets — don't rush them.</div>
+</div>
+
+<!-- ══════════════════════════════
+     THU — PUSH B
+══════════════════════════════ -->
+<div class="day-panel" id="day-3">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-push">Push B</div>
+      <div class="day-title-text">Thursday</div>
+      <div class="day-focus">Shoulder focus — overhead press leads</div>
+    </div>
+    <div class="exercise-count">7 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Shoulders — compound</span></div>
+
+  <div class="ex-card" id="pb1">
+    <div class="ex-main" onclick="toggle('pb1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body"><div class="ex-name">Barbell or machine overhead press</div><div class="ex-tip">Lead compound — heavier than dumbbell press</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 6–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb1"><div class="video-thumb" onclick="loadVideo('v-pb1','2yjwXTZQDDI')"><img src="https://img.youtube.com/vi/2yjwXTZQDDI/hqdefault.jpg" alt="Overhead Press"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Core braced hard, glutes squeezed</li><li>Head moves back briefly as bar passes</li><li>Full lockout at the top, bar over mid-foot</li><li>Lower controlled to shoulders each rep</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Excessive lower back arch. Brace your core before every single rep, not just the first.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Chest — secondary</span></div>
+
+  <div class="ex-card" id="pb2">
+    <div class="ex-main" onclick="toggle('pb2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body"><div class="ex-name">Incline dumbbell press</div><div class="ex-tip">Upper chest — shoulders still have output</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb2"><div class="video-thumb" onclick="loadVideo('v-pb2','8iPEnn-ltC8')"><img src="https://img.youtube.com/vi/8iPEnn-ltC8/hqdefault.jpg" alt="Incline DB Press"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>30–45° bench only</li><li>Shoulder blades retracted into pad throughout</li><li>Don't let shoulders roll forward at top</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Shoulders rotating forward at the top of the press. Keep blades pulled back for the entire set.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Triceps</span></div>
+
+  <div class="ex-card" id="pb3">
+    <div class="ex-main" onclick="toggle('pb3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body"><div class="ex-name">Skull crushers (EZ bar)</div><div class="ex-tip">Long head mass builder — lower slow</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb3"><div class="video-thumb" onclick="loadVideo('v-pb3','d_KZxkY_0cM')"><img src="https://img.youtube.com/vi/d_KZxkY_0cM/hqdefault.jpg" alt="Skull Crushers"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid">
+        <div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Upper arms vertical, elbows toward ceiling</li><li>Only forearms move — bend at elbows only</li><li>Lower toward forehead or slightly behind head</li><li>Elbows don't flare out during movement</li></ul></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Upper arms rocking back as you lower — turns it into a pullover. Upper arms must stay vertical.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Isolation finishers</span></div>
+
+  <div class="ex-card" id="pb4">
+    <div class="ex-main" onclick="toggle('pb4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body"><div class="ex-name">Cable lateral raise</div><div class="ex-tip">Side delt isolation — no swinging</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb4"><div class="video-thumb" onclick="loadVideo('v-pb4','Mb2culNbBMo')"><img src="https://img.youtube.com/vi/Mb2culNbBMo/hqdefault.jpg" alt="Cable Lateral Raise"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Lead with elbow, not hand</li><li>Pinky slightly higher than thumb at top</li><li>Controlled descent — resist the weight</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Body swinging to assist. Side delts are small — drop the weight and actually isolate them.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="pb5">
+    <div class="ex-main" onclick="toggle('pb5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body"><div class="ex-name">Cable crossover / pec deck fly</div><div class="ex-tip">Stretch-focused, squeeze at centre</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb5"><div class="video-thumb" onclick="loadVideo('v-pb5','taI4XduLpTk')"><img src="https://img.youtube.com/vi/taI4XduLpTk/hqdefault.jpg" alt="Cable Crossover"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Slight forward lean, slight elbow bend — keep both</li><li>Hug in an arc — hands almost cross at centre</li><li>Squeeze pecs hard at peak, open slowly</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Straight elbows — loads the elbow joint. Keep that bend constant throughout.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="pb6">
+    <div class="ex-main" onclick="toggle('pb6')">
+      <div class="ex-num">6</div>
+      <div class="ex-body"><div class="ex-name">Dumbbell front raise</div><div class="ex-tip">Anterior delt — no momentum</div></div>
+      <div class="ex-right"><span class="ex-sets">2 × 12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb6"><div class="video-thumb" onclick="loadVideo('v-pb6','hRjxmjRM5ZY')"><img src="https://img.youtube.com/vi/hRjxmjRM5ZY/hqdefault.jpg" alt="DB Front Raise"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Raise to shoulder height only — not above</li><li>Nearly straight arms — slight elbow bend</li><li>No swinging — slow and controlled</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Raising above shoulder height — that's traps, not front delts. Stop at shoulder level every rep.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="pb7">
+    <div class="ex-main" onclick="toggle('pb7')">
+      <div class="ex-num">7</div>
+      <div class="ex-body"><div class="ex-name">Cable pushdown (bar)</div><div class="ex-tip">Lateral head pump finisher</div></div>
+      <div class="ex-right"><span class="ex-sets">2 × 15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-pb7"><div class="video-thumb" onclick="loadVideo('v-pb7','vB5OHsJ3EME')"><img src="https://img.youtube.com/vi/vB5OHsJ3EME/hqdefault.jpg" alt="Cable Pushdown"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Upper arms locked to ribs — no movement</li><li>Full extension, squeeze hard at bottom</li><li>Return to 90° only — not higher</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Upper arms drifting forward. Lock them to your ribs and they stay there the entire set.</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     FRI — PULL B
+══════════════════════════════ -->
+<div class="day-panel" id="day-4">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-pull">Pull B</div>
+      <div class="day-title-text">Friday</div>
+      <div class="day-focus">Back thickness — horizontal pulling, traps, bicep volume</div>
+    </div>
+    <div class="exercise-count">6 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Back — thickness</span></div>
+
+  <div class="ex-card" id="plb1">
+    <div class="ex-main" onclick="toggle('plb1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body"><div class="ex-name">Seated cable row (close grip / V-bar)</div><div class="ex-tip">Lead compound — mid-back thickness</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 8–10</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb1"><div class="video-thumb" onclick="loadVideo('v-plb1','GZbfZ033f74')"><img src="https://img.youtube.com/vi/GZbfZ033f74/hqdefault.jpg" alt="Seated Cable Row"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Torso upright, lumbar arch maintained</li><li>Shoulder blades retract first, then pull</li><li>Handle to lower sternum, 1 sec peak squeeze</li><li>Full arm extension at the start</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Torso swinging forward and back. Upper body stays still — all movement is arms and shoulder blades.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="plb2">
+    <div class="ex-main" onclick="toggle('plb2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body"><div class="ex-name">Single-arm dumbbell row</div><div class="ex-tip">Full ROM — let shoulder blade travel</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10 each</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb2"><div class="video-thumb" onclick="loadVideo('v-plb2','pYcpY20QaE8')"><img src="https://img.youtube.com/vi/pYcpY20QaE8/hqdefault.jpg" alt="Single Arm DB Row"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Row toward hip — not armpit</li><li>Elbow stays close to the body</li><li>Shoulder blade fully retracts at the top</li><li>Let blade protract at bottom — this is the full ROM</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Rowing to the armpit with a flared elbow — that's rear delt work, not back. Elbow close, row to hip.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="plb3">
+    <div class="ex-main" onclick="toggle('plb3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body"><div class="ex-name">Cable face pull</div><div class="ex-tip">Rear delts + external rotation — shoulder health</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb3"><div class="video-thumb" onclick="loadVideo('v-plb3','rep-qVOkqgk')"><img src="https://img.youtube.com/vi/rep-qVOkqgk/hqdefault.jpg" alt="Cable Face Pull"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Elbows stay HIGH — at shoulder height minimum</li><li>Pull to face, hands to sides of ears</li><li>Externally rotate at peak — forearms point up</li><li>Hold peak 1–2 sec — this is the whole point</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Elbows dropping below shoulder height — turns it into a row. Elbows must stay high throughout.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Traps</span></div>
+
+  <div class="ex-card" id="plb4">
+    <div class="ex-main" onclick="toggle('plb4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body"><div class="ex-name">Dumbbell shrug</div><div class="ex-tip">Hold at top 1 second — straight up and down</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb4"><div class="video-thumb" onclick="loadVideo('v-plb4','cJRVVxmytaM')"><img src="https://img.youtube.com/vi/cJRVVxmytaM/hqdefault.jpg" alt="DB Shrug"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Straight up toward ears — no rolling</li><li>Hold peak for 1 full second</li><li>Lower slowly — feel the trap stretch</li><li>Arms stay straight throughout</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Rolling the shoulders in circles. Traps move vertically only — straight up, straight down.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Biceps</span></div>
+
+  <div class="ex-card" id="plb5">
+    <div class="ex-main" onclick="toggle('plb5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body"><div class="ex-name">Incline dumbbell curl</div><div class="ex-tip">Long head stretch — elbows stay behind torso</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb5"><div class="video-thumb" onclick="loadVideo('v-plb5','soxrZlIl35U')"><img src="https://img.youtube.com/vi/soxrZlIl35U/hqdefault.jpg" alt="Incline DB Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Arms hang behind torso — pre-stretches long head</li><li>Elbows stay behind torso — don't drift forward</li><li>Curl up, supinate at top, squeeze hard</li><li>Lower very slowly — the stretch is the point</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Elbows drifting forward removes the incline advantage entirely. Keep them behind your torso throughout.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="plb6">
+    <div class="ex-main" onclick="toggle('plb6')">
+      <div class="ex-num">6</div>
+      <div class="ex-body"><div class="ex-name">Cable curl (supinated)</div><div class="ex-tip">Constant tension finisher</div></div>
+      <div class="ex-right"><span class="ex-sets">2 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-plb6"><div class="video-thumb" onclick="loadVideo('v-plb6','NFzTWp2qpiE')"><img src="https://img.youtube.com/vi/NFzTWp2qpiE/hqdefault.jpg" alt="Cable Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Stand close to pulley — tension at bottom too</li><li>Supinated grip from start to finish</li><li>Elbows pinned, slow deliberate reps</li><li>Full extension at bottom — don't cut short</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Standing too far from the cable — you lose tension at the bottom where cables are best. Stay close.</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SAT — LEGS B
+══════════════════════════════ -->
+<div class="day-panel" id="day-5">
+  <div class="day-header">
+    <div>
+      <div class="day-tag tag-legs">Legs B</div>
+      <div class="day-title-text">Saturday</div>
+      <div class="day-focus">Posterior focus — hip hinge leads, quads secondary</div>
+    </div>
+    <div class="exercise-count">6 exercises · tap for form video</div>
+  </div>
+
+  <div class="section-divider"><span>Posterior chain — compound</span></div>
+
+  <div class="ex-card" id="lb1">
+    <div class="ex-main" onclick="toggle('lb1')">
+      <div class="ex-num">1</div>
+      <div class="ex-body"><div class="ex-name">Romanian deadlift (RDL)</div><div class="ex-tip">Heavier than Legs A — lead compound today</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 6–8</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb1"><div class="video-thumb" onclick="loadVideo('v-lb1','jEy_czb3RKA')"><img src="https://img.youtube.com/vi/jEy_czb3RKA/hqdefault.jpg" alt="RDL"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Soft knee bend locked throughout</li><li>Push hips back — bar stays close to legs</li><li>Hold bottom stretch 1 second</li><li>Drive hips forward, squeeze glutes at top</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Lower back rounding at the bottom. Stop where your back stays flat and build depth over time.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="lb2">
+    <div class="ex-main" onclick="toggle('lb2')">
+      <div class="ex-num">2</div>
+      <div class="ex-body"><div class="ex-name">Leg curl (seated if available)</div><div class="ex-tip">Seated = longer hamstring stretch vs lying</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb2"><div class="video-thumb" onclick="loadVideo('v-lb2','ELOCsoDSmrg')"><img src="https://img.youtube.com/vi/ELOCsoDSmrg/hqdefault.jpg" alt="Leg Curl"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Curl to full contraction, 1 sec squeeze</li><li>3 sec descent — resist all the way down</li><li>Full extension at the bottom every rep</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Jerking the weight up with momentum. Slow and controlled — reduce the weight if needed.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Quads — accessory</span></div>
+
+  <div class="ex-card" id="lb3">
+    <div class="ex-main" onclick="toggle('lb3')">
+      <div class="ex-num">3</div>
+      <div class="ex-body"><div class="ex-name">Leg press</div><div class="ex-tip">Different knee angle from squat — quad variety</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 10–12</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb3"><div class="video-thumb" onclick="loadVideo('v-lb3','IZxyjW7MPJQ')"><img src="https://img.youtube.com/vi/IZxyjW7MPJQ/hqdefault.jpg" alt="Leg Press"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Lower back and glutes pressed to seat throughout</li><li>Lower to 90° — don't let back peel off seat</li><li>Press through full foot — don't rise on toes</li><li>Don't lock knees at the top — keep tension</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Fully locking the knees at the top and resting. Keep a slight bend — maintain quad tension the whole set.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="lb4">
+    <div class="ex-main" onclick="toggle('lb4')">
+      <div class="ex-num">4</div>
+      <div class="ex-body"><div class="ex-name">Bulgarian split squat</div><div class="ex-tip">Lighter than Legs A — focus on feel</div></div>
+      <div class="ex-right"><span class="ex-sets">2 × 10 each</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb4"><div class="video-thumb" onclick="loadVideo('v-lb4','2C-uNgKwPLE')"><img src="https://img.youtube.com/vi/2C-uNgKwPLE/hqdefault.jpg" alt="Bulgarian Split Squat"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>All work through the front leg — rear is balance only</li><li>Drop straight down, rear knee nearly touches floor</li><li>Front knee tracks over 2nd/3rd toe</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Pushing off the rear foot to help. All drive comes from the front leg only.</div></div>
+    </div></div>
+  </div>
+
+  <div class="ex-card" id="lb5">
+    <div class="ex-main" onclick="toggle('lb5')">
+      <div class="ex-num">5</div>
+      <div class="ex-body"><div class="ex-name">Leg extension</div><div class="ex-tip">VMO isolation — slow controlled eccentric</div></div>
+      <div class="ex-right"><span class="ex-sets">3 × 12–15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb5"><div class="video-thumb" onclick="loadVideo('v-lb5','YyvSfVjQeL0')"><img src="https://img.youtube.com/vi/YyvSfVjQeL0/hqdefault.jpg" alt="Leg Extension"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Knee joint aligned with machine pivot point</li><li>Full extension — squeeze quads hard, 1 sec hold</li><li>3 sec descent — don't let weight drop</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Jerking up and letting it drop. This is a pump exercise — slow and controlled is the whole point.</div></div>
+    </div></div>
+  </div>
+
+  <div class="section-divider"><span>Calves</span></div>
+
+  <div class="ex-card" id="lb6">
+    <div class="ex-main" onclick="toggle('lb6')">
+      <div class="ex-num">6</div>
+      <div class="ex-body"><div class="ex-name">Seated calf raise</div><div class="ex-tip">Hits soleus — different from standing raise</div></div>
+      <div class="ex-right"><span class="ex-sets">4 × 15</span><span class="form-toggle"><svg class="play-icon" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l8 4.5-8 4.5z"/></svg> Form</span></div>
+    </div>
+    <div class="form-panel"><div class="form-inner">
+      <div class="video-label">Form guide</div>
+      <div class="video-wrap" id="v-lb6"><div class="video-thumb" onclick="loadVideo('v-lb6','JbyjNymZsfU')"><img src="https://img.youtube.com/vi/JbyjNymZsfU/hqdefault.jpg" alt="Seated Calf Raise"><div class="play-btn"><div class="play-circle"><svg width="20" height="20" viewBox="0 0 20 20" fill="#2563eb"><path d="M5 3l13 7-13 7z"/></svg></div></div></div></div>
+      <div class="cue-grid"><div class="cue-box"><div class="cue-label">Key cues</div><ul class="cue-list"><li>Knee at 90° — activates soleus (deep calf)</li><li>Heels hang off — lower fully, 2 sec pause</li><li>Rise to full toe contraction</li><li>Don't bounce out of the bottom stretch</li></ul></div></div>
+      <div class="mistake-box"><div class="mistake-label">⚠ Common mistake</div><div class="mistake-text">Skipping the bottom pause. The stretch under load is the stimulus — bouncing wastes the rep.</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SUN — REST
+══════════════════════════════ -->
+<div class="day-panel" id="day-6">
+  <div class="rest-panel">
+    <div class="rest-big">Rest.</div>
+    <p class="rest-sub">Muscle is built during recovery, not during training. Protect Sunday like a training day.</p>
+    <div class="rest-pills">
+      <span class="rest-pill">7–9 hrs sleep</span>
+      <span class="rest-pill">1.8–2.2 g protein / kg bodyweight</span>
+      <span class="rest-pill">Stay in calorie surplus</span>
+      <span class="rest-pill">Light walking is fine</span>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer class="footer">PPL Training Plan · 6-day A/B split · muscle growth & weight gain</footer>
+
+<script>
+  function show(idx) {
+    document.querySelectorAll('.day-panel').forEach((el,i) => el.classList.toggle('visible', i===idx));
+    document.querySelectorAll('.nav-btn').forEach((el,i) => el.classList.toggle('active', i===idx));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+  function loadVideo(wrapperId, ytId) {
+    const wrap = document.getElementById(wrapperId);
+    wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  }
+</script>
+</body>
+</html>
